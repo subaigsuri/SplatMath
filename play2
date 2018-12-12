@@ -1,0 +1,181 @@
+import java.awt.*;
+import javax.swing.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+public class play2 extends JFrame{
+    objFall car1;
+    Graphics g;
+    JLabel label;
+    BufferedImage bImage;
+    Timer myTimer;
+    ImageIcon iIcon;
+    objFall [] obj;
+    movement2 move1;
+    String key = "";
+    JPanel panel = new JPanel();
+    int a= 0;
+    
+//MAIN
+    public static void main ( String[] args ){
+        javax.swing.SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+                play2 play2 = new play2();
+    			play2.setVisible(false);
+            }
+        });
+    }
+//CONSTUCTOR
+    play2(){
+    	int random1;
+    	int random2;
+    	int[] num1=new int[24];
+    	int[] ans=new int[24];
+    	String[] ques=new String[24];
+    	int[]balloons=new int[4];
+    	int[] num2=new int[24];
+    	int randomnumball;
+    			 
+    	for(int i=0;i<24;i++) {
+    	random1=(int) (Math.random()*10-1);
+    	random2=(int)(Math.random()*10-1);
+    	num1[i]=random1;
+    	num2[i]=random2;
+    	int randomnum = (int)(Math.random()*3);		
+    				 
+    	if(randomnum==1) {
+    	ans[i]=num1[i]+num2[i];
+    	ques[i]=(num1[i]+"+"+num2[i]+"= ?");
+    	
+    	 }
+
+    	else if(randomnum==0) {
+    	ans[i]=num1[i]-num2[i];
+    	ques[i]=(num1[i]+"-"+num2[i]+"= ?");
+
+    	} 
+
+    	else if(randomnum==2) {
+    	ans[i]=num1[i]*num2[i];
+    	ques[i]=(num1[i]+"x"+num2[i]+"= ?");
+
+    					 
+    	 }	
+    				 } for(int c=1;c<4;c++) {
+    					 randomnumball=(int)(Math.random()*20);
+    					 balloons[0]=ans[0];
+    					 balloons[c]=randomnumball;	
+    			
+    					 
+    		 }
+    				 JLabel questions=new JLabel();
+    				 questions.setBounds(120, 80, 200, 200);
+    				 questions.setText(ques[a]);
+    				Font  f = new Font("serif", Font.PLAIN, 40);
+    				questions.setFont(f);
+    				getContentPane().add(questions);
+    				 
+
+        this.setLayout(new BorderLayout());
+        setTitle("move");       
+        setSize(1024, 768);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        this.setResizable(false);
+
+        //objFall
+        move1 = new movement2(50,310,Color.RED);
+        obj = new objFall[4]; 
+        for(int i = 0; i < 1; i++){
+            obj[i] = new objFall(550, 50, Color.BLUE);
+        }
+        for(int i = 1; i < 2; i++){
+            obj[i] = new objFall(650, 50, Color.BLACK);
+        }
+        for(int i = 2; i <3; i++){
+            obj[i] = new objFall(750,50, Color.PINK);
+        }
+        for(int i = 3; i < 4; i++){
+            obj[i] = new objFall(850, 50, Color.RED);
+        }       
+        label = new JLabel();
+        bImage = new BufferedImage(1024, 768, BufferedImage.TYPE_INT_ARGB);
+        g = bImage.getGraphics();   
+      //The code below adds a key listener to this window.
+	    this.addKeyListener (new KeyAdapter() {
+	      public void keyPressed(KeyEvent e) {
+	        System.out.println(e.getKeyCode());         
+	          if (e.getKeyCode() == KeyEvent.VK_LEFT){
+	        	  move1.moveLeft();
+	          }
+	          else if (e.getKeyCode() == KeyEvent.VK_RIGHT){
+	        	  move1.moveRight();
+	          }
+	       }
+	    });
+	    
+	    //TIMER
+	    myTimer = new Timer (15, new ActionListener(){
+            public void actionPerformed (ActionEvent evt){
+                drawBackground(g);
+                move1.drawMove(g);
+                drawBLeft(g);
+                
+                
+                for (int i =0;i<4;i++) {
+        			obj[i].move(-1);
+        			obj[i].draw1(g);
+        			drawTomato(g);
+        			if(move1.intersects(obj[i])) {
+        				System.out.println("Hit");
+        				obj[i].reset();
+        				a+=1;
+        				questions.setText(ques[a]);
+        				getContentPane().add(questions);
+        				//play.setVisible(true);
+        			}
+        		}         
+        		// move.lakeReset();         		
+                //apply the BufferedImage on the label
+                iIcon = new ImageIcon(bImage);// makes an ImageIcon from BufferedImage
+                label.setIcon(iIcon);//this applies the image onto the Jlabel
+                getContentPane().add(label);//this adds the label with the image onto the frame
+            }
+        });
+        myTimer.start();
+    }
+//BACKGROUND
+    public void drawBackground(Graphics g){
+        Graphics2D g2 = (Graphics2D) g;
+      //picture Background
+  	   String url = "playScreen.png";
+  	   ImageIcon icon = new ImageIcon(url);	
+  	   Image image = icon.getImage();
+  	   g2.drawImage(image,0,0,null);
+  	   JLabel img = new JLabel(icon);	
+  	   panel.add(img);  //add pic
+    }
+    public void drawBLeft(Graphics g){
+        Graphics2D g2 = (Graphics2D) g;
+  	//picture Background
+  	   int moveLX = move1.x - 60;
+  	   int moveLY = move1.y - 85;
+  	   String urlL = "basketLeft.gif";
+  	   ImageIcon iconL = new ImageIcon(urlL);	
+  	   Image imageL = iconL.getImage();
+  	   g2.drawImage(imageL,moveLX,moveLY,null);
+  	   JLabel imgL = new JLabel(iconL);	
+  	   panel.add(imgL);  //add pic
+    }
+    
+    public void drawTomato(Graphics g){
+        Graphics2D g2 = (Graphics2D) g;
+  	//picture Background
+   	   int moveLY = 50;
+  	   String urlL = "Tomato.png";
+  	   ImageIcon iconL = new ImageIcon(urlL);	
+  	   Image imageL = iconL.getImage();
+  	   g2.drawImage(imageL,480,moveLY--,null);
+  	   JLabel imgL = new JLabel(iconL);	
+  	   panel.add(imgL);  //add pic
+    }
+    
+}
